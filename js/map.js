@@ -37,13 +37,12 @@ class Map extends Phaser.Scene {
     create() {
         Dummy.createAnimations(this);
 
+        let wm = new WaveManager([
+            new EnemyPack('dummy', 5, 0, 1000),
+        ]);
+
         this.dummies = [];
-        for (var i = 0; i < 10; ++i) {
-            let d = new Dummy(this, this.path[0].x, this.path[0].y, 100);
-            d.currentNode = this.path[0];
-            d.getNodePoint(this.path[0].x, this.path[0].y);
-            this.dummies.push(d);
-        }
+        wm.spawnPack(this, wm.enemyPacks[0]);
 
         const graphics = this.add.graphics({
             lineStyle: {
@@ -59,7 +58,7 @@ class Map extends Phaser.Scene {
 
     }
 
-    update () {
+    update() {
         this.dummies.forEach((dummy) => {
             dummy.traversePath(this);
         });
