@@ -38,11 +38,19 @@ class Map extends Phaser.Scene {
         Dummy.createAnimations(this);
 
         let wm = new WaveManager([
-            new EnemyPack('dummy', 5, 0, 1000),
+            new EnemyWave([
+                new EnemyPack('dummy', 5, 0, 1500),
+                new EnemyPack('dummy', 10, 0, 300),
+            ]),
+            new EnemyWave([
+                new EnemyPack('dummy', 5, 0, 100),
+            ]),
         ]);
 
         this.dummies = [];
-        wm.spawnPack(this, wm.enemyPacks[0]);
+
+        wm.spawnCurrentWave(this);
+        wm.nextWave();
 
         const graphics = this.add.graphics({
             lineStyle: {
