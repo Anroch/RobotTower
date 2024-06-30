@@ -16,8 +16,9 @@ class PathNode {
 class Map extends Phaser.Scene {
     /**
      * @param {Array<[number, number]>} path points that compose the path
+     * @param {Array<EnemyWave>} waves enemy waves
      */
-    constructor(path) {
+    constructor(path, waves) {
         super();
 
         this.path = [];
@@ -28,6 +29,8 @@ class Map extends Phaser.Scene {
                 this.path[i - 1].next = i;
             }
         }
+
+        this.wm = new WaveManager(waves);
     }
 
     preload() {
@@ -36,21 +39,10 @@ class Map extends Phaser.Scene {
 
     create() {
         Dummy.createAnimations(this);
-
-        let wm = new WaveManager([
-            new EnemyWave([
-                new EnemyPack('dummy', 5, 0, 1500),
-                new EnemyPack('dummy', 10, 0, 300),
-            ]),
-            new EnemyWave([
-                new EnemyPack('dummy', 5, 0, 100),
-            ]),
-        ]);
-
         this.dummies = [];
 
-        wm.spawnCurrentWave(this);
-        wm.nextWave();
+        this.wm.spawnCurrentWave(this);
+        this.wm.nextWave();
 
         const graphics = this.add.graphics({
             lineStyle: {
