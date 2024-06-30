@@ -14,15 +14,15 @@ const ENEMY_REGISTRY = {
  * @param {number} count
  * @param {number} beforeSpawnTime
  * @param {number} spawnInterval
- * @param {number} spawnNode
+ * @param {number} spawnNodeIndex
  */
 class EnemyPack {
-    constructor(name, count, startAt, delay, spawnNode = 0) {
+    constructor(name, count, startAt, delay, spawnNodeIndex = 0) {
         this.name = name;
         this.count = count;
         this.startAt = startAt;
         this.delay = delay;
-        this.spawnNode = spawnNode;
+        this.spawnNodeIndex = spawnNodeIndex;
     }
 }
 
@@ -37,13 +37,17 @@ class WaveManager {
             delay: pack.delay,
             repeat: pack.count - 1, // ojo con esto
             callback: this.spawnEnemy,
-            args: [scene, pack.name, pack.spawnNode],
+            args: [scene, pack.name, pack.spawnNodeIndex],
         });
     }
 
-    spawnEnemy(scene, name, spawnNode) {
-        let e = new ENEMY_REGISTRY[name](scene, scene.path[spawnNode].x, scene.path[spawnNode].y);
-        e.currentNode = scene.path[spawnNode];
+    spawnEnemy(scene, name, spawnNodeIndex) {
+        let e = new ENEMY_REGISTRY[name](
+            scene,
+            scene.path[spawnNodeIndex].x,
+            scene.path[spawnNodeIndex].y
+        );
+        e.currentNode = scene.path[spawnNodeIndex];
         scene.dummies.push(e);
     }
 }
