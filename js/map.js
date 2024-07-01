@@ -16,7 +16,7 @@ class PathNode {
 
 class Map extends Phaser.Scene {
     /**
-     * @param {Array<[number, number]> | Array<[number, number, number]>} path points that compose the path
+     * @param {Array<[number, number, number | undefined]>} path points that compose the path
      * @param {Array<EnemyWave>} waves enemy waves
      */
     constructor(path, waves) {
