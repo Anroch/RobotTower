@@ -25,11 +25,8 @@ class Map extends Phaser.Scene {
         this.path = [];
         for (let i = 0; i < path.length; ++i) {
             let index = (path[i].length === 3) ? path[i][2] : ((i !== path.length - 1) ? i + 1 : null);
-            let p = new PathNode(path[i][0], path[i][1], index);
-            this.path.push(p);
+            this.path.push(new PathNode(path[i][0], path[i][1], index));
         }
-
-        console.log(this.path);
 
         this.wm = new WaveManager(waves);
     }
