@@ -5,15 +5,21 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
      * @param {number} y
      * @param {string} sprite
      * @param {string} enemyName
+     * @param {Array} list 
+     * @param {number} id
      * @param {PathNode} currentNode
      * @param {number} velocity
      */
-    constructor(scene, x, y, sprite, enemyName, currentNode = null, velocity = 100) {
+    constructor(scene, x, y, sprite, enemyName, list, id, currentNode = null, velocity = 100, health = 10) {
         super(scene, x, y, sprite);
-
         this.name = enemyName;
         this.currentNode = currentNode;
         this.velocity = velocity;
+        this.list = list;
+        this.id = id;
+        this.health = health;
+        this.isTakingDamage = false;
+        
 
         scene.physics.add.existing(this);
         scene.add.existing(this);
@@ -79,4 +85,30 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
             }
         }
     }
+
+    takeDamage(damage){
+        this.health = this.health - damage;
+    }
+
+    deactivate(){
+        if (this.health <= 0){
+            console.log("enemy: " +this.id + " is dead")
+            this.active = false;
+        }
+    }
+    
+    die(){
+        this.removeFromList(this.list)
+        this.destroy();
+    }
+
+    removeFromList(lista){
+        var index = lista.map(function(x) {return x.id;}).indexOf(this.id)
+        lista.splice(index,1);
+        // console.log(index+ " : " + this.id);
+        // const removed = this.list.splice(index,1);
+        // console.log(removed)
+        // console.log(this.list)
+    }
+
 }

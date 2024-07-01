@@ -4,8 +4,9 @@ class Dummy extends BaseEnemy {
      * @param {number} x
      * @param {number} y
      */
-    constructor(scene, x, y) {
-        super(scene, x, y, 'dude', 'dummy');
+    constructor(scene, x, y, list, id) {
+        super(scene, x, y, 'dude', 'dummy',list, id);
+ 
     }
 
     /**
