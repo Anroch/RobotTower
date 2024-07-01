@@ -5,17 +5,18 @@ class PathNode {
     /**
      * @param {number} x
      * @param {number} y
+     * @param {number} next
      */
-    constructor(x, y) {
+    constructor(x, y, next) {
         this.x = x;
         this.y = y;
-        this.next = null;
+        this.next = next;
     }
 }
 
 class Map extends Phaser.Scene {
     /**
-     * @param {Array<[number, number]>} path points that compose the path
+     * @param {Array<[[number, number], number]>} path points that compose the path
      * @param {Array<EnemyWave>} waves enemy waves
      */
     constructor(path, waves) {
@@ -23,11 +24,8 @@ class Map extends Phaser.Scene {
 
         this.path = [];
         for (let i = 0; i < path.length; ++i) {
-            this.path.push(new PathNode(path[i][0], path[i][1]));
-
-            if (i > 0) {
-                this.path[i - 1].next = i;
-            }
+            let p = new PathNode(path[i][0][0], path[i][0][1], path[i][1]);
+            this.path.push(p);
         }
 
         this.wm = new WaveManager(waves);
