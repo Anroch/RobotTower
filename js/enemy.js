@@ -21,6 +21,10 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
         this.isTakingDamage = false;
         
 
+        // npX/Y are the exact x, y values the enemy is going for
+        this.npX = x;
+        this.npY = y;
+
         scene.physics.add.existing(this);
         scene.add.existing(this);
     }

@@ -5,29 +5,30 @@ class PathNode {
     /**
      * @param {number} x
      * @param {number} y
+     * @param {number} next
      */
-    constructor(x, y) {
+    constructor(x, y, next) {
         this.x = x;
         this.y = y;
-        this.next = null;
+        this.next = next;
     }
 }
 
 class Map extends Phaser.Scene {
     /**
-     * @param {Array<[number, number]>} path points that compose the path
+     * @param {Array<[number, number, number | undefined]>} path points that compose the path
+     * @param {Array<EnemyWave>} waves enemy waves
      */
-    constructor(path) {
+    constructor(path, waves) {
         super();
 
         this.path = [];
         for (let i = 0; i < path.length; ++i) {
-            this.path.push(new PathNode(path[i][0], path[i][1]));
-
-            if (i > 0) {
-                this.path[i - 1].next = i;
-            }
+            let index = (path[i].length === 3) ? path[i][2] : ((i !== path.length - 1) ? i + 1 : null);
+            this.path.push(new PathNode(path[i][0], path[i][1], index));
         }
+
+        this.wm = new WaveManager(waves);
     }
 
     preload() {
@@ -39,15 +40,10 @@ class Map extends Phaser.Scene {
     create() {
         this.add.image(400, 300, 'road');
         Dummy.createAnimations(this);
-
         this.dummies = [];
-        for (var i = 0; i < 10; ++i) {
-            let d = new Dummy(this, this.path[0].x, this.path[0].y, this.dummies, i);
-            console.log(d.id);
-            d.currentNode = this.path[0];
-            d.getNodePoint(this.path[0].x, this.path[0].y);
-            this.dummies.push(d);    
-        }
+
+        this.wm.spawnCurrentWave(this);
+        this.wm.nextWave();
 
         const graphics = this.add.graphics({
             lineStyle: {
@@ -73,12 +69,11 @@ class Map extends Phaser.Scene {
         graphics.strokeCircle(this.tower.x,this.tower.y, 150);
     }
 
-    update () {
+    update() {
         this.dummies.forEach((dummy) => {
             dummy.traversePath(this);
             dummy.deactivate();
         });
-        
         
         this.tower.searchEnemy();
         this.tower.freeEnemy();
