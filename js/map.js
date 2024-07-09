@@ -5,45 +5,45 @@ class PathNode {
     /**
      * @param {number} x
      * @param {number} y
+     * @param {number} next
      */
-    constructor(x, y) {
+    constructor(x, y, next) {
         this.x = x;
         this.y = y;
-        this.next = null;
+        this.next = next;
     }
 }
 
 class Map extends Phaser.Scene {
     /**
-     * @param {Array<[number, number]>} path points that compose the path
+     * @param {Array<[number, number, number | undefined]>} path points that compose the path
+     * @param {Array<EnemyWave>} waves enemy waves
      */
-    constructor(path) {
+    constructor(path, waves) {
         super();
 
         this.path = [];
         for (let i = 0; i < path.length; ++i) {
-            this.path.push(new PathNode(path[i][0], path[i][1]));
-
-            if (i > 0) {
-                this.path[i - 1].next = i;
-            }
+            let index = (path[i].length === 3) ? path[i][2] : ((i !== path.length - 1) ? i + 1 : null);
+            this.path.push(new PathNode(path[i][0], path[i][1], index));
         }
+
+        this.wm = new WaveManager(waves);
     }
 
     preload() {
         this.load.spritesheet('dude', '../assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.image('road','../assets/road.png');
+        this.load.image('tower','../assets/tower.png');
     }
 
     create() {
+        this.add.image(400, 300, 'road');
         Dummy.createAnimations(this);
-
         this.dummies = [];
-        for (var i = 0; i < 10; ++i) {
-            let d = new Dummy(this, this.path[0].x, this.path[0].y, 100);
-            d.currentNode = this.path[0];
-            d.getNodePoint(this.path[0].x, this.path[0].y);
-            this.dummies.push(d);
-        }
+
+        this.wm.spawnCurrentWave(this);
+        this.wm.nextWave();
 
         const graphics = this.add.graphics({
             lineStyle: {
@@ -57,11 +57,32 @@ class Map extends Phaser.Scene {
             graphics.strokeCircle(node.x, node.y, PATH_NODE_RADIUS);
         });
 
+        this.tower = new Tower(this, 250,300, 'tower', this.dummies);
+
+        this.attackTimer = this.time.addEvent({
+            callback: this.tower.attack,
+            callbackScope: this.tower,
+            delay: 1000,
+            loop: true
+        });
+
+        graphics.strokeCircle(this.tower.x,this.tower.y, 150);
     }
 
-    update () {
+    update() {
         this.dummies.forEach((dummy) => {
             dummy.traversePath(this);
+            dummy.deactivate();
+        });
+        
+        this.tower.searchEnemy();
+        this.tower.freeEnemy();
+
+        this.dummies.forEach((dummy) => {
+            if(!dummy.active){
+                dummy.die();
+            }
         });
     }
+
 }
